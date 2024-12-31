@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microservices Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input {
+            margin-right: 10px;
+        }
+        #userList, #postList, #notificationList {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Microservices Example</h1>
+
+<!-- User Registration Form -->
+<h2>User Registration</h2>
+<form id="userForm">
+    <input type="text" id="username" placeholder="Enter username" required>
+    <button type="submit">Register User</button>
+</form>
+
+<!-- Post Creation Form -->
+<h2>Create Post</h2>
+<form id="postForm">
+    <input type="text" id="postContent" placeholder="Enter post content" required>
+    <button type="submit">Create Post</button>
+</form>
+
+<!-- User List -->
+<h2>Registered Users</h2>
+<ul id="userList"></ul>
+
+<!-- Post List -->
+<h2>Posts</h2>
+<ul id="postList"></ul>
+
+<!-- Notification List -->
+<h2>Notifications</h2>
+<ul id="notificationList"></ul>
+
+<script>
+    // Function to fetch and display users
+    async function fetchUsers() {
+        const response = await fetch('http://localhost:8080/api/users');
+        const users = await response.json();
+        const userList = document.getElementById('userList');
+        userList.innerHTML = ''; // Clear the list before adding new items
+        users.forEach(user => {
+            const li = document.createElement('li');
+            li.textContent = user.username;
+            userList.appendChild(li);
+        });
+    }
+
+    // Function to fetch and display posts
+    async function fetchPosts() {
+        const response = await fetch('http://localhost:8080/api/posts');
+        const posts = await response.json();
+        const postList = document.getElementById('postList');
+        postList.innerHTML = ''; // Clear the list before adding new items
+        posts.forEach(post => {
+            const li = document.createElement('li');
+            li.textContent = post.content;
+            postList.appendChild(li);
+        });
+    }
+
+    // Function to fetch and display notifications
+    async function fetchNotifications() {
+        const response = await fetch('http://localhost:8080/api/notifications');
+        const notifications = await response.json();
+        const notificationList = document.getElementById('notificationList');
+        notificationList.innerHTML = ''; // Clear the list before adding new items
+        notifications.forEach(notification => {
+            const li = document.createElement('li');
+            li.textContent = notification.message;
+            notificationList.appendChild(li);
+        });
+    }
+
+    // Event listener for user registration form submission
+    document.getElementById('userForm').addEventListener('submit', async (event) => {
+        event.preventDefault(); // Prevent the form from submitting the traditional way
+        const username = document.getElementById('username').value;
+
+        // Send a POST request to register the user
+        await fetch('http://localhost:8080/api/users/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username })
+        });
+
+        // Clear the input field
+        document.getElementById('username').value = '';
+
+        // Fetch and display the updated user list
+        fetchUsers();
+    });
+
+    // Event listener for post creation form submission
+    document.getElementById('postForm').addEventListener('submit', async (event) => event.preventDefault());// Prevent the form from submitting the traditional way
+        const postContent = document.getElementById('postContent').value;
+
+        // Send a POST request to create a new post
+        await fetch('http://localhost:8080/api/posts/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content: postContent })
+        });
+
+        // Clear the input field
+        document.getElementById('postContent').value = '';
+
+        // Fetch and display the updated post list
+        fetchPosts();
+    
+    // Initial fetch of users, posts, and notifications
+    fetchUsers();
+    fetchPosts();
+    fetchNotifications();
+</script>
+
+</body>
+</html>
